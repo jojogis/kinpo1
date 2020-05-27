@@ -87,14 +87,14 @@ int main(int argc, char *argv[])
     analyzeFileWithNames(names,profNames);
 
     foreach(Sentence sentence,sentences){
-        Rules::checkRule1(profNames,sentence);
-        Rules::checkRule2(profNames,sentence);
-        Rules::checkRule3(profNames,sentence,professions);
-        Rules::checkRule4(profNames,sentence);
-        Rules::checkRule5(profNames,sentence);
-        Rules::checkRule6(profNames,sentence);
-        Rules::checkRule7(profNames,sentence);
-        Rules::checkRule8(profNames,sentence,professions);
+        Rules::checkRuleCompound (profNames,sentence);
+        Rules::checkRuleAmod(profNames,sentence);
+        Rules::checkRuleToBe(profNames,sentence,professions);
+        Rules::checkRuleAppos1 (profNames,sentence);
+        Rules::checkRuleAppos2 (profNames,sentence);
+        Rules::checkRuleToWork (profNames,sentence);
+        Rules::checkRuleReignOf (profNames,sentence);
+        Rules::checkRuleJob (profNames,sentence,professions);
     }
 
 

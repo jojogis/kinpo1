@@ -7,7 +7,7 @@ Rules::Rules()
 
 }
 
-void Rules::checkRule1(QHash<QString,QString> &profNames,Sentence &sentence)
+void Rules::checkRuleCompound(QHash<QString,QString> &profNames,Sentence &sentence)
 {
     foreach(Token token,sentence.tokens){
         if((token.pos == Token::NN || token.pos == Token::NNP) && token.ner == Token::PERSON &&
@@ -19,7 +19,7 @@ void Rules::checkRule1(QHash<QString,QString> &profNames,Sentence &sentence)
         }
     }
 }
-void Rules::checkRule2(QHash<QString,QString> &profNames,Sentence &sentence)
+void Rules::checkRuleAmod(QHash<QString,QString> &profNames,Sentence &sentence)
 {
     foreach(Token token,sentence.tokens){
         if((token.pos == Token::NN || token.pos == Token::NNP) && token.ner == Token::PERSON &&
@@ -32,7 +32,7 @@ void Rules::checkRule2(QHash<QString,QString> &profNames,Sentence &sentence)
         }
     }
 }
-void Rules::checkRule3(QHash<QString,QString> &profNames,Sentence &sentence,QStringList profList)
+void Rules::checkRuleToBe(QHash<QString,QString> &profNames,Sentence &sentence,QStringList profList)
 {
     for(int i = 0; i<sentence.tokens.size() - 2;i++){
         if((sentence.tokens[i].pos == Token::NN || sentence.tokens[i].pos == Token::NNP) &&
@@ -44,7 +44,7 @@ void Rules::checkRule3(QHash<QString,QString> &profNames,Sentence &sentence,QStr
     }
 }
 
-void Rules::checkRule4(QHash<QString, QString> &profNames, Sentence &sentence)
+void Rules::checkRuleAppos1 (QHash<QString, QString> &profNames, Sentence &sentence)
 {
     foreach(Token token,sentence.tokens){
         if((token.pos == Token::NN || token.pos == Token::NNP) && token.ner == Token::PERSON &&
@@ -56,7 +56,7 @@ void Rules::checkRule4(QHash<QString, QString> &profNames, Sentence &sentence)
         }
     }
 }
-void Rules::checkRule5(QHash<QString, QString> &profNames, Sentence &sentence)
+void Rules::checkRuleAppos2(QHash<QString, QString> &profNames, Sentence &sentence)
 {
     foreach(Token token,sentence.tokens){
         if((token.pos == Token::NN || token.pos == Token::NNP) && token.ner == Token::PERSON &&
@@ -69,7 +69,7 @@ void Rules::checkRule5(QHash<QString, QString> &profNames, Sentence &sentence)
     }
 }
 
-void Rules::checkRule6(QHash<QString, QString> &profNames, Sentence &sentence)
+void Rules::checkRuleToWork(QHash<QString, QString> &profNames, Sentence &sentence)
 {
     foreach(Token token,sentence.tokens){
         if(token.lemma == "work" && token.nsubjDep != -1 && token.objDep != -1){
@@ -84,7 +84,7 @@ void Rules::checkRule6(QHash<QString, QString> &profNames, Sentence &sentence)
     }
 }
 
-void Rules::checkRule7(QHash<QString, QString> &profNames, Sentence &sentence)
+void Rules::checkRuleReignOf(QHash<QString, QString> &profNames, Sentence &sentence)
 {
     for(int i = 1; i<sentence.tokens.size();i++){
         if((sentence.tokens[i].pos == Token::NN || sentence.tokens[i].pos == Token::NNP) &&
@@ -95,7 +95,7 @@ void Rules::checkRule7(QHash<QString, QString> &profNames, Sentence &sentence)
     }
 }
 
-void Rules::checkRule8(QHash<QString, QString> &profNames, Sentence &sentence,QStringList &profList){
+void Rules::checkRuleJob(QHash<QString, QString> &profNames, Sentence &sentence,QStringList &profList){
     foreach(Token token,sentence.tokens){
         if((token.pos == Token::NN || token.pos == Token::NNP) &&
                 (token.ner == Token::TITLE || profList.indexOf(token.lemma) != -1) &&
