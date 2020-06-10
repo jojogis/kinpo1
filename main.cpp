@@ -7,16 +7,17 @@
 #include <QDomDocument>
 
 QTextStream cin(stdin);
-void readFileWithNames(QString fileName,QString &error,QStringList &data);
+void analyzeFileWithNames(QStringList names,QHash<QString,QString> &profNames,const QStringList &perpList);
 QStringList readFileWithProfessions(QString fileName,QString &error);
 QList<Sentence> readFileWithText(QString fileName,QString &error);
+void readFileWithNames(QString fileName,QString &error,QStringList &res);
 
-QStringList perpList = {"sir","ser","esq.","monsieu","lady","magister","Brother","sister","father","master","Dr.",
-                       "princess","prince","king","queen","lord"};
 
 void analyzeFileWithNames(QStringList names,QHash<QString,QString> &profNames);
 int main(int argc, char *argv[])
 {
+    QStringList perpList = {"sir","ser","esq.","monsieu","lady","magister","Brother","sister","father","master","Dr.",
+                           "princess","prince","king","queen","lord"};
     QCoreApplication a(argc, argv);
     setlocale(LC_ALL,"Russian");
     QString textFileName;
@@ -84,15 +85,17 @@ int main(int argc, char *argv[])
 
     QHash<QString,QString> profNames = QHash<QString,QString>();
 
-    analyzeFileWithNames(names,profNames);
+    analyzeFileWithNames(names,profNames,perpList);
+
+    professions.append(perpList);
 
     foreach(Sentence sentence,sentences){
-        Rules::checkRuleCompound (profNames,sentence);
-        Rules::checkRuleAmod(profNames,sentence);
+        Rules::checkRuleCompound (profNames,sentence,professions);
+        Rules::checkRuleAmod(profNames,sentence,professions);
         Rules::checkRuleToBe(profNames,sentence,professions);
-        Rules::checkRuleAppos1 (profNames,sentence);
-        Rules::checkRuleAppos2 (profNames,sentence);
-        Rules::checkRuleToWork (profNames,sentence);
+        Rules::checkRuleAppos1 (profNames,sentence,professions);
+        Rules::checkRuleAppos2 (profNames,sentence,professions);
+        Rules::checkRuleToWork (profNames,sentence,professions);
         Rules::checkRuleReignOf (profNames,sentence);
         Rules::checkRuleJob (profNames,sentence,professions);
     }
@@ -105,7 +108,7 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 
-void analyzeFileWithNames(QStringList names,QHash<QString,QString> &profNames){
+void analyzeFileWithNames(QStringList names,QHash<QString,QString> &profNames,const QStringList &perpList){
     foreach (QString name, names) {
         foreach(QString prof,perpList){
             if(name.indexOf(prof) != -1){
@@ -115,14 +118,14 @@ void analyzeFileWithNames(QStringList names,QHash<QString,QString> &profNames){
     }
 }
 
-void readFileWithNames(QString fileName,QString &error,QStringList &data){
+void readFileWithNames(QString fileName,QString &error,QStringList &res){
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         error = file.errorString();
         throw 4;
     }
     QFileInfo info(fileName);
-    if(info.completeSuffix() != "txt"){
+    if(info.suffix() != "txt"){
         throw 3;
     }
     while(!file.atEnd()){
@@ -130,9 +133,9 @@ void readFileWithNames(QString fileName,QString &error,QStringList &data){
         name= name.remove("\n").toLower();
         QRegExp latReg("([a-z]|\\s)+");
         if(!latReg.exactMatch(name))throw 6;
-        data.append(name);
+        res.append(name);
     }
-    if(data.size() == 0)throw 5;
+    if(res.size() == 0)throw 5;
 }
 
 QStringList readFileWithProfessions(QString fileName,QString &error){
@@ -142,7 +145,7 @@ QStringList readFileWithProfessions(QString fileName,QString &error){
         throw 12;
     }
     QFileInfo info(fileName);
-    if(info.completeSuffix() != "txt"){
+    if(info.suffix() != "txt"){
         throw 11;
     }
     QStringList res;
@@ -164,7 +167,7 @@ QList<Sentence> readFileWithText(QString fileName,QString &error){
         throw 2;
     }
     QFileInfo info(fileName);
-    if(info.completeSuffix() != "xml"){
+    if(info.suffix() != "xml"){
         throw 1;
     }
     QString data = file.readAll();
@@ -184,13 +187,14 @@ QList<Sentence> readFileWithText(QString fileName,QString &error){
              QString word = tokens.at(b).namedItem("word").toElement().text();
              QString lemma = tokens.at(b).namedItem("lemma").toElement().text();
              int id = tokens.at(b).toElement().attribute("id").toInt();
-             Token token = Token(word,lemma,id);
-             token.setNER(tokens.at(b).namedItem("NER").toElement().text());
-             token.setPOS(tokens.at(b).namedItem("POS").toElement().text());
+             QString pos = tokens.at(b).namedItem("POS").toElement().text();
+             QString ner = tokens.at(b).namedItem("NER").toElement().text();
+             Token token = Token(word,lemma,id,pos,ner);
+             qDebug() << "sentence.tokens.append(Token(" << word << "," << lemma << "," << id << "," << pos << "," << ner << "));";
              sentence.tokens.append(token);
          }
          QDomNode depsNode = sentencesXml.at(t).namedItem("dependencies");
-         while(depsNode.toElement().attribute("type")!="enhanced-dependencies")depsNode = depsNode.nextSibling();
+         while(depsNode.toElement().attribute("type")!="basic-dependencies")depsNode = depsNode.nextSibling();
          QDomNodeList deps = depsNode.childNodes();
          for(int b = 0; b < deps.size(); b++){
              QString type = deps.at(b).toElement().attribute("type").split(":")[0];
@@ -198,6 +202,7 @@ QList<Sentence> readFileWithText(QString fileName,QString &error){
              int idGov = deps.at(b).namedItem("governor").toElement().attribute("idx").toInt();
              int idDep = deps.at(b).namedItem("dependent").toElement().attribute("idx").toInt();
              sentence.getById(idGov).setDep(type,idDep);
+             qDebug() << "sentence.getById(" << idGov << ").setDep(" << type << "," << idDep << ");";
              }
          }
         res.append(sentence);

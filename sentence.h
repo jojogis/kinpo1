@@ -9,7 +9,8 @@ class Sentence
 public:
     Sentence();
     QList<Token> tokens;
-    Token& getById(int id);
+    const Token& Sentence::getById(int id) const;
+    Token& Sentence::getById(int id);
 };
 
 #endif // SENTENCE_H

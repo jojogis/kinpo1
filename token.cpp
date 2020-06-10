@@ -1,10 +1,12 @@
 #include "token.h"
 
-Token::Token(QString word,QString lemma,int id)
+Token::Token(QString word,QString lemma,int id,QString pos,QString ner)
 {
     this->word = word;
     this->id = id;
     this->lemma = lemma;
+    this->setPOS(pos);
+    this->setNER(ner);
 }
 void Token::setPOS(QString str){
     this->pos = (POS)POSStr.indexOf(str);
