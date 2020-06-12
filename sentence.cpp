@@ -16,3 +16,12 @@ Token& Sentence::getById(int id){
     }
     return tokens[0];
 }
+
+QString Sentence::getString() const
+{
+    QString res;
+    for(int i = 0; i < tokens.size();i++){
+        res += tokens.at(i).word + " ";
+    }
+    return res.left(res.size() - 1);
+}

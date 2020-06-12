@@ -28,7 +28,7 @@ void Token::setDep(QString type, int id)
         this->caseDep= id;
     }else if(type=="nsubj"){
         this->nsubjDep= id;
-    }else if(type=="obj"){
+    }else if(type=="obl"){
         this->objDep= id;
     }
 }
@@ -37,6 +37,6 @@ void Token::setNER(QString str){
 }
 
 bool Token::isNeededDep(QString str){
-    QStringList list = {"compound","amod","appos","punct","nmod","case","nsubj","obj"};
+    QStringList list = {"compound","amod","appos","punct","nmod","case","nsubj","obl"};
     return list.indexOf(str) != -1;
 }

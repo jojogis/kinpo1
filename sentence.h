@@ -11,6 +11,7 @@ public:
     QList<Token> tokens;
     const Token& Sentence::getById(int id) const;
     Token& Sentence::getById(int id);
+    QString getString() const;
 };
 
 #endif // SENTENCE_H

@@ -6,14 +6,15 @@
 #include <QFileInfo>
 #include <QDomDocument>
 
+
 QTextStream cin(stdin);
-void analyzeFileWithNames(QStringList names,QHash<QString,QString> &profNames,const QStringList &perpList);
+
 QStringList readFileWithProfessions(QString fileName,QString &error);
 QList<Sentence> readFileWithText(QString fileName,QString &error);
 void readFileWithNames(QString fileName,QString &error,QStringList &res);
 
 
-void analyzeFileWithNames(QStringList names,QHash<QString,QString> &profNames);
+void analyzeFileWithNames(QStringList names,QMultiHash<QString,QString> &profNames);
 int main(int argc, char *argv[])
 {
     QStringList perpList = {"sir","ser","esq.","monsieu","lady","magister","Brother","sister","father","master","Dr.",
@@ -83,9 +84,9 @@ int main(int argc, char *argv[])
         return e;
     }
 
-    QHash<QString,QString> profNames = QHash<QString,QString>();
+    QMultiHash<QString,QString> profNames = QMultiHash<QString,QString>();
 
-    analyzeFileWithNames(names,profNames,perpList);
+    Rules::analyzeFileWithNames(names,profNames,perpList);
 
     professions.append(perpList);
 
@@ -108,15 +109,6 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 
-void analyzeFileWithNames(QStringList names,QHash<QString,QString> &profNames,const QStringList &perpList){
-    foreach (QString name, names) {
-        foreach(QString prof,perpList){
-            if(name.indexOf(prof) != -1){
-                profNames.insert(name.remove(prof),prof);
-            }
-        }
-    }
-}
 
 void readFileWithNames(QString fileName,QString &error,QStringList &res){
     QFile file(fileName);

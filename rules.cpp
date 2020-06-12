@@ -7,120 +7,139 @@ Rules::Rules()
 
 }
 
-void Rules::checkRuleCompound(QHash<QString,QString> &profNames,const Sentence &sentence,const QStringList &profList)
+void Rules::checkRuleCompound(QMultiHash<QString,QString> &profNames,const Sentence &sentence,const QStringList &profList)
 {
     foreach(Token token,sentence.tokens){
-        if((token.pos == Token::NN || token.pos == Token::NNP) && token.ner == Token::PERSON &&
+        if(isNN(token) && token.ner == Token::PERSON &&
                 token.compoundDep != -1 &&
-                (sentence.getById(token.compoundDep).pos == Token::NN || sentence.getById(token.compoundDep).pos == Token::NNP)
-                && (sentence.getById(token.compoundDep).ner == Token::TITLE ||
-                isInProfList(sentence.getById(token.compoundDep).lemma,profList) ) ){
+                isNN(sentence.getById(token.compoundDep))
+                && isInProfList(sentence.getById(token.compoundDep),profList) ){
             QString prof;
             getCompoundProf(sentence,token.compoundDep,prof,profList);
             profNames.insert(token.word,prof);
         }
     }
 }
-void Rules::checkRuleAmod(QHash<QString,QString> &profNames,const Sentence &sentence,const QStringList &profList)
+void Rules::checkRuleAmod(QMultiHash<QString,QString> &profNames,const Sentence &sentence,const QStringList &profList)
 {
     foreach(Token token,sentence.tokens){
-        if((token.pos == Token::NN || token.pos == Token::NNP) && token.ner == Token::PERSON &&
+        if(isNN(token) && token.ner == Token::PERSON &&
                 token.amodDep != -1 &&
                 sentence.getById(token.amodDep).pos == Token::JJ
                 && sentence.getById(token.amodDep).ner == Token::TITLE &&
                 sentence.getById(token.amodDep).word[0].isUpper()){
             QString prof;
             getCompoundProf(sentence,token.amodDep,prof,profList);
+            checkForAnd(sentence,token.amodDep,profList,profNames,token.word);
             profNames.insert(token.word,prof);
         }
     }
 }
-void Rules::checkRuleToBe(QHash<QString,QString> &profNames,const Sentence &sentence,const QStringList &profList)
+void Rules::checkRuleToBe(QMultiHash<QString,QString> &profNames,const Sentence &sentence,const QStringList &profList)
 {
     for(int i = 0; i<sentence.tokens.size() - 2;i++){
-        if((sentence.tokens[i].pos == Token::NN || sentence.tokens[i].pos == Token::NNP) &&
+        if(isNN(sentence.tokens[i]) &&
                 sentence.tokens[i].ner == Token::PERSON && sentence.tokens[i+1].lemma == "be" &&
-                (sentence.tokens[i+2].pos == Token::NN || sentence.tokens[i+2].pos == Token::NNP) &&
-                (sentence.tokens[i+2].ner == Token::TITLE || profList.indexOf(sentence.tokens[i+2].lemma) != -1)){
+                isNN(sentence.tokens[i+2]) &&
+                isInProfList(sentence.tokens[i+2],profList)){
+                checkForAnd(sentence,i+3,profList,profNames,sentence.tokens[i].word);
                 profNames.insert(sentence.tokens[i].word,sentence.tokens[i+2].word);
         }
     }
     for(int i = 0; i<sentence.tokens.size() - 3;i++){
-        if((sentence.tokens[i].pos == Token::NN || sentence.tokens[i].pos == Token::NNP) &&
+        if(isNN(sentence.tokens[i]) &&
                 sentence.tokens[i].ner == Token::PERSON && sentence.tokens[i+1].lemma == "be" &&
                 sentence.tokens[i+2].lemma == "a" &&
-                (sentence.tokens[i+3].pos == Token::NN || sentence.tokens[i+3].pos == Token::NNP) &&
-                (sentence.tokens[i+3].ner == Token::TITLE || profList.indexOf(sentence.tokens[i+2].lemma) != -1)){
+                isNN(sentence.tokens[i+3]) &&
+                isInProfList(sentence.tokens[i+3],profList)){
+                checkForAnd(sentence,i+4,profList,profNames,sentence.tokens[i].word);
                 profNames.insert(sentence.tokens[i].word,sentence.tokens[i+3].word);
         }
     }
+
+
 }
 
-void Rules::checkRuleAppos1 (QHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList)
+void Rules::checkRuleAppos1 (QMultiHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList)
 {
     foreach(Token token,sentence.tokens){
-        if((token.pos == Token::NN || token.pos == Token::NNP) && token.ner == Token::PERSON &&
+        if(isNN(token) && token.ner == Token::PERSON &&
                 token.apposDep != -1 &&
-                (sentence.getById(token.apposDep).pos == Token::NN || sentence.getById(token.apposDep).pos == Token::NNP)
+                isNN(sentence.getById(token.apposDep))
                 && sentence.getById(token.apposDep).ner == Token::TITLE && token.punctDep != -1){
-
-            profNames.insert(token.word,sentence.getById(token.apposDep).word);
+            checkForAnd(sentence,token.apposDep,profList,profNames,token.word);
+            QString prof;
+            getCompoundProf(sentence,token.apposDep,prof,profList);
+            profNames.insert(token.word,prof);
         }
     }
 }
-void Rules::checkRuleAppos2(QHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList)
+void Rules::checkRuleAppos2(QMultiHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList)
 {
     foreach(Token token,sentence.tokens){
-        if((token.pos == Token::NN || token.pos == Token::NNP) && token.ner == Token::PERSON &&
+        if(isNN(token) && isInProfList(token,profList) &&
                 token.apposDep != -1 &&
-                (sentence.getById(token.apposDep).pos == Token::NN || sentence.getById(token.apposDep).pos == Token::NNP)
-                && sentence.getById(token.apposDep).ner == Token::TITLE && sentence.getById(token.apposDep).punctDep != -1){
-
-            profNames.insert(token.word,sentence.getById(token.apposDep).word);
+                isNN(sentence.getById(token.apposDep))
+                && sentence.getById(token.apposDep).ner == Token::PERSON && token.punctDep != -1){
+            checkForAnd(sentence,token.id,profList,profNames,sentence.getById(token.apposDep).word);
+            QString prof;
+            getCompoundProf(sentence,token.id,prof,profList);
+            profNames.insert(sentence.getById(token.apposDep).word,prof);
         }
     }
 }
 
-void Rules::checkRuleToWork(QHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList)
+void Rules::checkRuleToWork(QMultiHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList)
 {
     foreach(Token token,sentence.tokens){
         if(token.lemma == "work" && token.nsubjDep != -1 && token.objDep != -1){
             Token person = sentence.getById(token.nsubjDep);
             Token title = sentence.getById(token.objDep);
-            if((person.pos == Token::NN || person.pos == Token::NNP) && person.ner == Token::PERSON &&
-                    (title.pos == Token::NN || title.pos == Token::NNP) && title.ner == Token::TITLE){
-                profNames.insert(person.word,title.word);
+            if(isNN(person) && person.ner == Token::PERSON &&
+                    isNN(title) && title.ner == Token::TITLE){
+                QString prof;
+                getCompoundProf(sentence,token.objDep,prof,profList);
+                checkForAnd(sentence,token.objDep,profList,profNames,person.word);
+                profNames.insert(person.word,prof);
             }
 
         }
     }
 }
 
-void Rules::checkRuleReignOf(QHash<QString, QString> &profNames, const Sentence &sentence)
+void Rules::checkRuleReignOf(QMultiHash<QString, QString> &profNames, const Sentence &sentence)
 {
-    for(int i = 1; i<sentence.tokens.size();i++){
-        if((sentence.tokens[i].pos == Token::NN || sentence.tokens[i].pos == Token::NNP) &&
-                sentence.tokens[i].ner == Token::PERSON && sentence.tokens[i-1].lemma == "reign"){
+    for(int i = 2; i<sentence.tokens.size();i++){
+        if(isNN(sentence.tokens[i]) &&
+                sentence.tokens[i].ner == Token::PERSON && sentence.tokens[i-2].lemma == "reign"){
 
                 profNames.insert(sentence.tokens[i].word,"King");
+                if(i < sentence.tokens.size() - 2 && sentence.tokens[i+1].lemma == "and"){
+                    profNames.insert(sentence.tokens[i+2].word,"King");
+                }
         }
     }
 }
 
-void Rules::checkRuleJob(QHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList){
+void Rules::checkRuleJob(QMultiHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList){
     foreach(Token token,sentence.tokens){
-        if((token.pos == Token::NN || token.pos == Token::NNP) &&
+        if(isNN(token) &&
                 (token.ner == Token::TITLE || profList.indexOf(token.lemma) != -1) &&
                 token.nsubjDep != -1 &&
-                (sentence.getById(token.nsubjDep).pos == Token::NN || sentence.getById(token.nsubjDep).pos == Token::NNP) &&
+                isNN(sentence.getById(token.nsubjDep)) &&
                 sentence.getById(token.nsubjDep).lemma == "job"){
             Token job = sentence.getById(token.nsubjDep);
-            if((job.pos == Token::NN || job.pos == Token::NNP) && job.nmodDep != -1 &&
-                    (sentence.getById(job.nmodDep).pos == Token::NN || sentence.getById(job.nmodDep).pos == Token::NNP) &&
+            if(isNN(job) && job.nmodDep != -1 &&
+                    isNN(sentence.getById(job.nmodDep)) &&
                     sentence.getById(job.nmodDep).ner == Token::PERSON){
                 Token person = sentence.getById(job.nmodDep);
                 if(person.caseDep != -1 && sentence.getById(person.caseDep).lemma == "'s"){
-                    profNames.insert(person.word,token.word);
+                    QString prof;
+
+                    checkForAnd(sentence,token.id,profList,profNames,person.word);
+                    getCompoundProf(sentence,token.id,prof,profList);
+                    profNames.insert(person.word,prof);
+
                 }
 
             }
@@ -128,36 +147,80 @@ void Rules::checkRuleJob(QHash<QString, QString> &profNames, const Sentence &sen
     }
 }
 
-void Rules::getCompoundProf(const Sentence &sentence, int id, QString &res,const QStringList &profList)
+void Rules::checkRuleToPractice(QMultiHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList)
 {
-    //int depId = sentence.getById(id).compoundDep;
-    //if(depId != -1){
-    //    if(id < depId)res = sentence.getById(id).word + " " + sentence.getById(depId).word;
-    //    else res = sentence.getById(depId).word + " " + sentence.getById(id).word;
-    //}else{
-    //    res = sentence.getById(id).word;
-    //}
-    QString curWord = sentence.getById(id).word;
-    if(id != 0){
-        QString prevWordProf = sentence.getById(id - 1).word + " " + curWord;
-        if(profList.contains(prevWordProf.toLower())){
-            res = prevWordProf;
-            return;
+    foreach(Token token,sentence.tokens){
+        if(token.lemma == "practice" && token.nsubjDep != -1 && token.objDep != -1){
+            Token person = sentence.getById(token.nsubjDep);
+            Token title = sentence.getById(token.objDep);
+            if(isNN(person) && person.ner == Token::PERSON &&
+                    isNN(title) && title.ner == Token::TITLE){
+                QString prof;
+                getCompoundProf(sentence,token.objDep,prof,profList);
+                checkForAnd(sentence,token.objDep,profList,profNames,person.word);
+                profNames.insert(person.word,prof);
+            }
+
         }
     }
-    QString nextWordProf = curWord + " " + sentence.getById(id + 1).word;
-    if(profList.contains(nextWordProf.toLower())){
-        res = nextWordProf;
+}
+void Rules::getCompoundProf(const Sentence &sentence, int id, QString &res,const QStringList &profList)
+{
+
+    QString curWord = sentence.getById(id).word.toLower();
+
+    for(QString profInList : profList){
+        if(profInList.split(' ').contains(curWord,Qt::CaseInsensitive)){
+            if(sentence.getString().contains(profInList,Qt::CaseInsensitive)){
+                res = profInList;
+                return;
+            }
+        }
+    }
+    if(sentence.getById(id+1).ner == Token::TITLE){
+        res = curWord + " " +sentence.getById(id+1).word;
         return;
     }
+    if(sentence.getById(id-1).ner == Token::TITLE){
+        res = sentence.getById(id-1).word + " " + curWord;
+        return;
+    }
+
     res = curWord;
 }
 
-bool Rules::isInProfList(const QString prof, const QStringList &profList)
+void Rules::checkForAnd(const Sentence &sentence, int id,const QStringList &profList,QMultiHash<QString, QString> &profNames,const QString name){
+    if(sentence.getById(id + 1).lemma == "and"){
+        if(sentence.getById(id + 2).lemma == "a" && isInProfList(sentence.getById(id + 3),profList)){
+            profNames.insert(name,sentence.getById(id + 3).lemma);
+        }else if(isInProfList(sentence.getById(id + 2),profList)){
+            profNames.insert(name,sentence.getById(id + 2).lemma);
+        }
+    }
+}
+
+bool Rules::isNN(const Token token)
 {
-    QString profLower = prof.toLower();
+    return token.pos == Token::NN || token.pos == Token::NNP;
+}
+
+bool Rules::isInProfList(const Token prof, const QStringList &profList)
+{
+    if(prof.ner == Token::TITLE)return true;
+    QString profLower = prof.lemma.toLower();
     for(QString profInList : profList){
-        if(profInList.split(' ').contains(profLower))return true;
+        if(profInList.split(' ').contains(profLower,Qt::CaseInsensitive))return true;
     }
     return false;
+}
+
+
+void Rules::analyzeFileWithNames(QStringList names,QMultiHash<QString,QString> &profNames,const QStringList &perpList){
+    foreach (QString name, names) {
+        foreach(QString prof,perpList){
+            if(name.toLower().indexOf(prof) != -1){
+                profNames.insert(name.toLower().remove(prof),prof);
+            }
+        }
+    }
 }
