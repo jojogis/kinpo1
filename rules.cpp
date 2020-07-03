@@ -1,3 +1,7 @@
+/*!
+    \file
+    \brief Файл, содержищий реализацию класса Rules
+*/
 #include "rules.h"
 
 #include <QHash>
@@ -6,7 +10,15 @@ Rules::Rules()
 {
 
 }
-
+/*!
+    \brief Функция поиска профессии по связи Compound.
+    Если часть речи – NN или NNP
+    и тег аннотатора NER – person и присутствует compoundDep и он связывает часть речи
+    – NN или NNP со словом с тегом TITLE
+    \param [in,out] profNames список пар имя-профессия
+    \param [in] sentence предложение
+    \param [in] profList список профессий
+*/
 void Rules::checkRuleCompound(QMultiHash<QString,QString> &profNames,const Sentence &sentence,const QStringList &profList)
 {
     foreach(Token token,sentence.tokens){
@@ -20,6 +32,14 @@ void Rules::checkRuleCompound(QMultiHash<QString,QString> &profNames,const Sente
         }
     }
 }
+/*!
+    \brief Функция поиска профессии по связи Amod.
+    Если часть речи – NN или NNP и тег аннотатора NER – person и присутствует amodDep
+    и он связывает часть речи – NN или NNP со словом с тегом TITLE и это слово с заглавной буквы
+    \param [in,out] profNames список пар имя-профессия
+    \param [in] sentence предложение
+    \param [in] profList список профессий
+*/
 void Rules::checkRuleAmod(QMultiHash<QString,QString> &profNames,const Sentence &sentence,const QStringList &profList)
 {
     foreach(Token token,sentence.tokens){
@@ -35,6 +55,12 @@ void Rules::checkRuleAmod(QMultiHash<QString,QString> &profNames,const Sentence 
         }
     }
 }
+/*!
+    \brief Функция поиска профессии по устойчивому выражению to be + a(an)
+    \param [in,out] profNames список пар имя-профессия
+    \param [in] sentence предложение
+    \param [in] profList список профессий
+*/
 void Rules::checkRuleToBe(QMultiHash<QString,QString> &profNames,const Sentence &sentence,const QStringList &profList)
 {
     for(int i = 0; i<sentence.tokens.size() - 2;i++){
@@ -59,7 +85,12 @@ void Rules::checkRuleToBe(QMultiHash<QString,QString> &profNames,const Sentence 
 
 
 }
-
+/*!
+    \brief Функция поиска профессии по связи Appos и punct, которая является связью от NNP(Person)
+    \param [in,out] profNames список пар имя-профессия
+    \param [in] sentence предложение
+    \param [in] profList список профессий
+*/
 void Rules::checkRuleAppos1 (QMultiHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList)
 {
     foreach(Token token,sentence.tokens){
@@ -74,6 +105,12 @@ void Rules::checkRuleAppos1 (QMultiHash<QString, QString> &profNames, const Sent
         }
     }
 }
+/*!
+    \brief Функция поиска профессии по связи Appos и punct, которая является связью от NN(Title)
+    \param [in,out] profNames список пар имя-профессия
+    \param [in] sentence предложение
+    \param [in] profList список профессий
+*/
 void Rules::checkRuleAppos2(QMultiHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList)
 {
     foreach(Token token,sentence.tokens){
@@ -88,7 +125,12 @@ void Rules::checkRuleAppos2(QMultiHash<QString, QString> &profNames, const Sente
         }
     }
 }
-
+/*!
+    \brief Функция поиска профессии по устойчивому выражению to work + as a(an)
+    \param [in,out] profNames список пар имя-профессия
+    \param [in] sentence предложение
+    \param [in] profList список профессий
+*/
 void Rules::checkRuleToWork(QMultiHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList)
 {
     foreach(Token token,sentence.tokens){
@@ -106,7 +148,11 @@ void Rules::checkRuleToWork(QMultiHash<QString, QString> &profNames, const Sente
         }
     }
 }
-
+/*!
+    \brief Функция поиска профессии по устойчивому выражению reign of
+    \param [in,out] profNames список пар имя-профессия
+    \param [in] sentence предложение
+*/
 void Rules::checkRuleReignOf(QMultiHash<QString, QString> &profNames, const Sentence &sentence)
 {
     for(int i = 2; i<sentence.tokens.size();i++){
@@ -120,8 +166,14 @@ void Rules::checkRuleReignOf(QMultiHash<QString, QString> &profNames, const Sent
         }
     }
 }
-
-void Rules::checkRuleJob(QMultiHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList){
+/*!
+    \brief Функция поиска профессии по устойчивому выражению job + to be
+    \param [in,out] profNames список пар имя-профессия
+    \param [in] sentence предложение
+    \param [in] profList список профессий
+*/
+void Rules::checkRuleJob(QMultiHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList)
+{
     foreach(Token token,sentence.tokens){
         if(isNN(token) &&
                 (token.ner == Token::TITLE || profList.indexOf(token.lemma) != -1) &&
@@ -146,7 +198,12 @@ void Rules::checkRuleJob(QMultiHash<QString, QString> &profNames, const Sentence
         }
     }
 }
-
+/*!
+    \brief Функция поиска профессии по устойчивому выражению to practice
+    \param [in,out] profNames список пар имя-профессия
+    \param [in] sentence предложение
+    \param [in] profList список профессий
+*/
 void Rules::checkRuleToPractice(QMultiHash<QString, QString> &profNames, const Sentence &sentence,const QStringList &profList)
 {
     foreach(Token token,sentence.tokens){
@@ -164,6 +221,13 @@ void Rules::checkRuleToPractice(QMultiHash<QString, QString> &profNames, const S
         }
     }
 }
+/*!
+    \brief Собирает составную профессию
+    \param [in] sentence предложение
+    \param [in] id id найденной профессии
+    \param [in] profList список профессий
+    \param [out] res составная профессия, если найдена, иначе - изначальная профессия
+*/
 void Rules::getCompoundProf(const Sentence &sentence, int id, QString &res,const QStringList &profList)
 {
 
@@ -188,8 +252,16 @@ void Rules::getCompoundProf(const Sentence &sentence, int id, QString &res,const
 
     res = curWord;
 }
-
-void Rules::checkForAnd(const Sentence &sentence, int id,const QStringList &profList,QMultiHash<QString, QString> &profNames,const QString name){
+/*!
+    \brief Проверяет, на наличие еще одной профессии, отделенной союзом and
+    \param [in] sentence предложение
+    \param [in] id id найденной профессии
+    \param [in] profList список профессий
+    \param [in,out] profNames список пар имя-профессия
+    \param [in] name имя для найденной професии
+*/
+void Rules::checkForAnd(const Sentence &sentence, int id,const QStringList &profList,QMultiHash<QString, QString> &profNames,const QString name)
+{
     if(sentence.getById(id + 1).lemma == "and"){
         if(sentence.getById(id + 2).lemma == "a" && isInProfList(sentence.getById(id + 3),profList)){
             profNames.insert(name,sentence.getById(id + 3).lemma);
@@ -198,12 +270,21 @@ void Rules::checkForAnd(const Sentence &sentence, int id,const QStringList &prof
         }
     }
 }
-
+/*!
+    \brief Проверяет, явлется ли слово подлежащим
+    \param [in] token слово
+    \return true, если является, иначе - false
+*/
 bool Rules::isNN(const Token token)
 {
     return token.pos == Token::NN || token.pos == Token::NNP;
 }
-
+/*!
+    \brief Проверяет, есть ли слово в списке профессий
+    \param [in] prof слово
+    \param [in] profList список профессий
+    \return true - если есть, иначе - false
+*/
 bool Rules::isInProfList(const Token prof, const QStringList &profList)
 {
     if(prof.ner == Token::TITLE)return true;
@@ -214,8 +295,14 @@ bool Rules::isInProfList(const Token prof, const QStringList &profList)
     return false;
 }
 
-
-void Rules::analyzeFileWithNames(QStringList names,QMultiHash<QString,QString> &profNames,const QStringList &perpList){
+/*!
+    \brief Производит анализ файла с именами на содержание профессий в именах
+    \param [in] names список имен
+    \param [in,out] profNames список пар имя-профессия
+    \param [in] perpList список приставок
+*/
+void Rules::analyzeFileWithNames(QStringList names,QMultiHash<QString,QString> &profNames,const QStringList &perpList)
+{
     foreach (QString name, names) {
         foreach(QString prof,perpList){
             if(name.toLower().indexOf(prof) != -1){

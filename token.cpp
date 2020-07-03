@@ -8,10 +8,19 @@ Token::Token(QString word,QString lemma,int id,QString pos,QString ner)
     this->setPOS(pos);
     this->setNER(ner);
 }
-void Token::setPOS(QString str){
+/*!
+\brief Устанавливает часть речи
+\param [in] str имя части речи
+*/
+void Token::setPOS(QString str)
+{
     this->pos = (POS)POSStr.indexOf(str);
 }
-
+/*!
+\brief Устанавливает зависимость
+\param [in] type имя зависимости
+\param [in] id id зависимого слова
+*/
 void Token::setDep(QString type, int id)
 {
     if(type=="compound"){
@@ -32,11 +41,17 @@ void Token::setDep(QString type, int id)
         this->objDep= id;
     }
 }
-void Token::setNER(QString str){
+void Token::setNER(QString str)
+{
     this->ner = (NER)NERStr.indexOf(str);
 }
-
-bool Token::isNeededDep(QString str){
+/*!
+\brief Проверяет, нужна ли зависимость с данным именем
+\param [in] имя зависимости
+\return true - если нужна, иначе - false
+*/
+bool Token::isNeededDep(QString str)
+{
     QStringList list = {"compound","amod","appos","punct","nmod","case","nsubj","obl"};
     return list.indexOf(str) != -1;
 }
