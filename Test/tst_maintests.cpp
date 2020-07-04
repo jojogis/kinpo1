@@ -86,6 +86,7 @@ private slots:
     void checRuleJob_twoPersAndTwoProfs();
     void checRuleJob_twoPersOneWithProf();
     void checRuleJob_twoPersWithoutProf();
+    void checRuleJob_mix1();
     void checkRuleToPractice_oneProf();
     void checkRuleToPractice_twoProf();
     void checkRuleToPractice_compProf();
@@ -1855,6 +1856,42 @@ void MainTests::checRuleJob_twoPersWithoutProf(){
     sentence.getById( 11 ).setDep( "nsubj" , 9 );
     Rules::checkRuleJob(profNames,sentence,profList);
     QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+//несколько односложный профессий у одно и одна составная у другого(из списка)
+void MainTests::checRuleJob_mix1(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "Mike" , "Mike" , 1 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "'s" , "'s" , 2 , "POS" , "O" ));
+    sentence.tokens.append(Token( "job" , "job" , 3 , "NN" , "O" ));
+    sentence.tokens.append(Token( "are" , "be" , 4 , "VBP" , "O" ));
+    sentence.tokens.append(Token( "policeman" , "policeman" , 5 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "and" , "and" , 6 , "CC" , "O" ));
+    sentence.tokens.append(Token( "soldier" , "soldier" , 7 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "and" , "and" , 8 , "CC" , "O" ));
+    sentence.tokens.append(Token( "Carls" , "Carls" , 9 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "'s" , "'s" , 10 , "POS" , "O" ));
+    sentence.tokens.append(Token( "job" , "job" , 11 , "NN" , "O" ));
+    sentence.tokens.append(Token( "is" , "be" , 12 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 13 , "DT" , "O" ));
+    sentence.tokens.append(Token( "cyberpoliceman" , "cyberpoliceman" , 14 , "NN" , "TITLE" ));
+    sentence.getById( 3 ).setDep( "nmod" , 1 );
+    sentence.getById( 1 ).setDep( "case" , 2 );
+    sentence.getById( 5 ).setDep( "nsubj" , 3 );
+    sentence.getById( 11 ).setDep( "nmod" , 9 );
+    sentence.getById( 9 ).setDep( "case" , 10 );
+    sentence.getById( 14 ).setDep( "nsubj" , 11 );
+    Rules::checkRuleJob(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    expected.insert("Mike","policeman");
+    expected.insert("Mike","soldier");
+    expected.insert("Carls","cyberpoliceman");
     QString message;
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
