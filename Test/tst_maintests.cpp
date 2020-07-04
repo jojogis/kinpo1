@@ -59,6 +59,7 @@ private slots:
     void checkRuleAppos2_oneProf();
     void checkRuleAppos2_compProf();
     void checkRuleAppos2_notInList();
+    void checkRuleAppos2_compProfNotInList();
     void checkRuleToWork_oneProf();
     void checkRuleToWork_compProf();
     void checkRuleToWork_fewProf();
@@ -1103,6 +1104,33 @@ void MainTests::checkRuleAppos2_notInList(){
     sentence.getById( 6 ).setDep( "punct" , 7 );
     sentence.getById( 6 ).setDep( "appos" , 8 );
     sentence.getById( 3 ).setDep( "punct" , 9 );
+    Rules::checkRuleAppos2(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleAppos2_compProfNotInList(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    profList.append("fire mage");
+    profList.append("hunter");
+    profList.append("major captain");
+    sentence.tokens.append(Token( "He" , "he" , 1 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "was" , "be" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "killed" , "kill" , 3 , "VBN" , "O" ));
+    sentence.tokens.append(Token( "by" , "by" , 4 , "IN" , "O" ));
+    sentence.tokens.append(Token( "cyberprisoner" , "cyberprisoner" , 5 , "NN" , "O" ));
+    sentence.tokens.append(Token( "," , "," , 6 , "," , "O" ));
+    sentence.tokens.append(Token( "Gideon" , "Gideon" , 7 , "NNP" , "PERSON" ));
+    sentence.getById( 3 ).setDep( "nsubj" , 1 );
+    sentence.getById( 5 ).setDep( "case" , 4 );
+    sentence.getById( 3 ).setDep( "obl" , 5 );
+    sentence.getById( 5 ).setDep( "punct" , 6 );
+    sentence.getById( 5 ).setDep( "appos" , 7 );
     Rules::checkRuleAppos2(profNames,sentence,profList);
     QMultiHash<QString,QString> expected;
     QString message;
