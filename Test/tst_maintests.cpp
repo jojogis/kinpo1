@@ -61,6 +61,7 @@ private slots:
     void checkRuleAppos2_notInList();
     void checkRuleAppos2_compProfNotInList();
     void checkRuleAppos2_twoProfs();
+    void checkRuleAppos2_profAndCompProf();
     void checkRuleToWork_oneProf();
     void checkRuleToWork_compProf();
     void checkRuleToWork_fewProf();
@@ -1163,6 +1164,40 @@ void MainTests::checkRuleAppos2_twoProfs(){
     Rules::checkRuleAppos2(profNames,sentence,profList);
     QMultiHash<QString,QString> expected;
     expected.insert("Gideon","policeman");
+    expected.insert("Gideon","detective");
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleAppos2_profAndCompProf(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    profList.append("fire mage");
+    profList.append("hunter");
+    profList.append("major captain");
+    sentence.tokens.append(Token( "He" , "he" , 1 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "was" , "be" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "saved" , "save" , 3 , "VBN" , "O" ));
+    sentence.tokens.append(Token( "by" , "by" , 4 , "IN" , "O" ));
+    sentence.tokens.append(Token( "police" , "police" , 5 , "NNS" , "TITLE" ));
+    sentence.tokens.append(Token( "officer" , "officer" , 6 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "and" , "and" , 7 , "CC" , "O" ));
+    sentence.tokens.append(Token( "detective" , "detective" , 8 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "," , "," , 9 , "," , "O" ));
+    sentence.tokens.append(Token( "Gideon" , "Gideon" , 10 , "NNP" , "PERSON" ));
+    sentence.getById( 3 ).setDep( "nsubj" , 1 );
+    sentence.getById( 6 ).setDep( "case" , 4 );
+    sentence.getById( 3 ).setDep( "obl" , 6 );
+    sentence.getById( 6 ).setDep( "punct" , 9 );
+    sentence.getById( 8 ).setDep( "punct" , 9 );
+    sentence.getById( 6 ).setDep( "appos" , 10 );
+    sentence.getById( 8 ).setDep( "appos" , 10 );
+    Rules::checkRuleAppos2(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    expected.insert("Gideon","police officer");
     expected.insert("Gideon","detective");
     QString message;
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
