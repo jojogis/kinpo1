@@ -106,7 +106,9 @@ private slots:
     void checRuleJob_mix1();
     void checRuleJob_jobNotNN();
     void checRuleJob_noJobWord();
-
+    void checRuleJob_noNmodDep();
+    void checRuleJob_personNotNN();
+    void checRuleJob_noApostrophe();
     void checkRuleToPractice_oneProf();
     void checkRuleToPractice_twoProf();
     void checkRuleToPractice_compProf();
@@ -2420,6 +2422,67 @@ void MainTests::checRuleJob_noJobWord(){
 }
 
 
+void MainTests::checRuleJob_noNmodDep(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "Mark" , "Mark" , 1 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "'s" , "'s" , 2 , "POS" , "O" ));
+    sentence.tokens.append(Token( "job" , "job" , 3 , "NN" , "O" ));
+    sentence.tokens.append(Token( "is" , "be" , 4 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 5 , "DT" , "O" ));
+    sentence.tokens.append(Token( "builder" , "builder" , 6 , "NN" , "TITLE" ));
+    sentence.getById( 1 ).setDep( "case" , 2 );
+    sentence.getById( 6 ).setDep( "nsubj" , 3 );
+    Rules::checkRuleJob(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checRuleJob_personNotNN(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "Mark" , "Mark" , 1 , "O" , "PERSON" ));
+    sentence.tokens.append(Token( "'s" , "'s" , 2 , "POS" , "O" ));
+    sentence.tokens.append(Token( "job" , "job" , 3 , "NN" , "O" ));
+    sentence.tokens.append(Token( "is" , "be" , 4 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 5 , "DT" , "O" ));
+    sentence.tokens.append(Token( "builder" , "builder" , 6 , "NN" , "TITLE" ));
+    sentence.getById( 3 ).setDep( "nmod" , 1 );
+    sentence.getById( 1 ).setDep( "case" , 2 );
+    sentence.getById( 6 ).setDep( "nsubj" , 3 );
+    Rules::checkRuleJob(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checRuleJob_noApostrophe(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "Mark" , "Mark" , 1 , "NN" , "PERSON" ));
+    sentence.tokens.append(Token( "s" , "s" , 2 , "POS" , "O" ));
+    sentence.tokens.append(Token( "job" , "job" , 3 , "NN" , "O" ));
+    sentence.tokens.append(Token( "is" , "be" , 4 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 5 , "DT" , "O" ));
+    sentence.tokens.append(Token( "builder" , "builder" , 6 , "NN" , "TITLE" ));
+    sentence.getById( 3 ).setDep( "nmod" , 1 );
+    sentence.getById( 1 ).setDep( "case" , 2 );
+    sentence.getById( 6 ).setDep( "nsubj" , 3 );
+    Rules::checkRuleJob(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
 
 void MainTests::checkRuleToPractice_oneProf(){
     QMultiHash<QString,QString> profNames;
