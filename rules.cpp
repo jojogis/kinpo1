@@ -69,6 +69,8 @@ void Rules::checkRuleToBe(QMultiHash<QString,QString> &profNames,const Sentence 
                 isNN(sentence.tokens[i+2]) &&
                 isInProfList(sentence.tokens[i+2],profList)){
                 checkForAnd(sentence,i+3,profList,profNames,sentence.tokens[i].word);
+                QString prof;
+                getCompoundProf(sentence,sentence.tokens[i+2].id,prof,profList);
                 profNames.insert(sentence.tokens[i].word,sentence.tokens[i+2].word);
         }
     }
@@ -79,7 +81,9 @@ void Rules::checkRuleToBe(QMultiHash<QString,QString> &profNames,const Sentence 
                 isNN(sentence.tokens[i+3]) &&
                 isInProfList(sentence.tokens[i+3],profList)){
                 checkForAnd(sentence,i+4,profList,profNames,sentence.tokens[i].word);
-                profNames.insert(sentence.tokens[i].word,sentence.tokens[i+3].word);
+                QString prof;
+                getCompoundProf(sentence,sentence.tokens[i+3].id,prof,profList);
+                profNames.insert(sentence.tokens[i].word,prof);
         }
     }
 
@@ -275,7 +279,7 @@ void Rules::checkForAnd(const Sentence &sentence, int id,const QStringList &prof
     \param [in] token слово
     \return true, если является, иначе - false
 */
-bool Rules::isNN(const Token token)
+bool Rules::isNN(const Token &token)
 {
     return token.pos == Token::NN || token.pos == Token::NNP;
 }
@@ -285,7 +289,7 @@ bool Rules::isNN(const Token token)
     \param [in] profList список профессий
     \return true - если есть, иначе - false
 */
-bool Rules::isInProfList(const Token prof, const QStringList &profList)
+bool Rules::isInProfList(const Token &prof, const QStringList &profList)
 {
     if(prof.ner == Token::TITLE)return true;
     QString profLower = prof.lemma.toLower();
