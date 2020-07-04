@@ -53,6 +53,7 @@ private slots:
     void checkRuleAppos1_compProf();
     void checkRuleAppos1_twoProf();
     void checkRuleAppos1_notInList();
+    void checkRuleAppos1_compProfNotInList();
     void checkRuleAppos2_noProf();
     void checkRuleAppos2_oneProf();
     void checkRuleAppos2_compProf();
@@ -935,6 +936,29 @@ void MainTests::checkRuleAppos1_notInList(){
     sentence.tokens.append(Token( "the" , "the" , 5 , "DT" , "O" ));
     sentence.tokens.append(Token( "forest" , "forest" , 6 , "NN" , "O" ));
     sentence.tokens.append(Token( "archer" , "archer" , 7 , "NN" , "O" ));
+    sentence.getById( 3 ).setDep( "nsubj" , 1 );
+    sentence.getById( 3 ).setDep( "punct" , 4 );
+    sentence.getById( 7 ).setDep( "compound" , 6 );
+    sentence.getById( 3 ).setDep( "appos" , 7 );
+    Rules::checkRuleAppos1(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleAppos1_compProfNotInList(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "It" , "it" , 1 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "was" , "be" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "Catrin" , "Catrin" , 3 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "," , "," , 4 , "," , "O" ));
+    sentence.tokens.append(Token( "the" , "the" , 5 , "DT" , "O" ));
+    sentence.tokens.append(Token( "forest" , "forest" , 6 , "NN" , "O" ));
+    sentence.tokens.append(Token( "queen" , "queen" , 7 , "NN" , "O" ));
     sentence.getById( 3 ).setDep( "nsubj" , 1 );
     sentence.getById( 3 ).setDep( "punct" , 4 );
     sentence.getById( 7 ).setDep( "compound" , 6 );
