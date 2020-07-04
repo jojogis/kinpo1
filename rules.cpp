@@ -180,7 +180,7 @@ void Rules::checkRuleJob(QMultiHash<QString, QString> &profNames, const Sentence
 {
     foreach(Token token,sentence.tokens){
         if(isNN(token) &&
-                (token.ner == Token::TITLE || profList.indexOf(token.lemma) != -1) &&
+                isInProfList(token,profList) &&
                 token.nsubjDep != -1 &&
                 isNN(sentence.getById(token.nsubjDep)) &&
                 sentence.getById(token.nsubjDep).lemma == "job"){
