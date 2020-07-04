@@ -80,6 +80,12 @@ private slots:
     void checkRuleToWork_twoCompProf();
     void checkRuleToWork_profAndCompProfNotInList();
     void checkRuleToWork_twoPersons();
+    void checkRuleToWork_noNsubjDep();
+    void checkRuleToWork_noObjDep();
+    void checkRuleToWork_notPerson();
+    void checkRuleToWork_personIsNotNN();
+    void checkRuleToWork_noTitle();
+    void checkRuleToWork_titleIsNotNN();
     void checkRuleReignOf_oneProf();
     void checkRuleReignOf_twoCharacter();
     void checkRuleReignOf_profNotToPerson();
@@ -1708,6 +1714,180 @@ void MainTests::checkRuleToWork_twoPersons(){
     QMultiHash<QString,QString> expected;
     expected.insert("Carl","doctor");
     expected.insert("Gabe","detective");
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleToWork_noNsubjDep(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    profList.append("fire mage");
+    profList.append("hunter");
+    profList.append("major captain");
+    sentence.tokens.append(Token( "we" , "we" , 1 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "found" , "find" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "out" , "out" , 3 , "RP" , "O" ));
+    sentence.tokens.append(Token( "that" , "that" , 4 , "IN" , "O" ));
+    sentence.tokens.append(Token( "Abigail" , "Abigail" , 5 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "worked" , "work" , 6 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 7 , "IN" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 8 , "DT" , "O" ));
+    sentence.tokens.append(Token( "manager" , "manager" , 9 , "NN" , "TITLE" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 2 ).setDep( "compound" , 3 );
+    sentence.getById( 9 ).setDep( "case" , 7 );
+    sentence.getById( 6 ).setDep( "obl" , 9 );
+    Rules::checkRuleToWork(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleToWork_noObjDep(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    profList.append("fire mage");
+    profList.append("hunter");
+    profList.append("major captain");
+    sentence.tokens.append(Token( "we" , "we" , 1 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "found" , "find" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "out" , "out" , 3 , "RP" , "O" ));
+    sentence.tokens.append(Token( "that" , "that" , 4 , "IN" , "O" ));
+    sentence.tokens.append(Token( "Abigail" , "Abigail" , 5 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "worked" , "work" , 6 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 7 , "IN" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 8 , "DT" , "O" ));
+    sentence.tokens.append(Token( "manager" , "manager" , 9 , "NN" , "TITLE" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 2 ).setDep( "compound" , 3 );
+    sentence.getById( 9 ).setDep( "case" , 7 );
+    sentence.getById( 6 ).setDep( "nsubj" , 5 );
+    Rules::checkRuleToWork(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleToWork_notPerson(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    profList.append("fire mage");
+    profList.append("hunter");
+    profList.append("major captain");
+    sentence.tokens.append(Token( "we" , "we" , 1 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "found" , "find" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "out" , "out" , 3 , "RP" , "O" ));
+    sentence.tokens.append(Token( "that" , "that" , 4 , "IN" , "O" ));
+    sentence.tokens.append(Token( "Abigail" , "Abigail" , 5 , "NN" , "O" ));
+    sentence.tokens.append(Token( "worked" , "work" , 6 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 7 , "IN" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 8 , "DT" , "O" ));
+    sentence.tokens.append(Token( "manager" , "manager" , 9 , "NN" , "TITLE" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 2 ).setDep( "compound" , 3 );
+    sentence.getById( 6 ).setDep( "nsubj" , 5 );
+    sentence.getById( 9 ).setDep( "case" , 7 );
+    sentence.getById( 6 ).setDep( "obl" , 9 );
+    Rules::checkRuleToWork(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+
+void MainTests::checkRuleToWork_personIsNotNN(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    profList.append("fire mage");
+    profList.append("hunter");
+    profList.append("major captain");
+    sentence.tokens.append(Token( "we" , "we" , 1 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "found" , "find" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "out" , "out" , 3 , "RP" , "O" ));
+    sentence.tokens.append(Token( "that" , "that" , 4 , "IN" , "O" ));
+    sentence.tokens.append(Token( "Abigail" , "Abigail" , 5 , "O" , "PERSON" ));
+    sentence.tokens.append(Token( "worked" , "work" , 6 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 7 , "IN" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 8 , "DT" , "O" ));
+    sentence.tokens.append(Token( "manager" , "manager" , 9 , "NN" , "TITLE" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 2 ).setDep( "compound" , 3 );
+    sentence.getById( 6 ).setDep( "nsubj" , 5 );
+    sentence.getById( 9 ).setDep( "case" , 7 );
+    sentence.getById( 6 ).setDep( "obl" , 9 );
+    Rules::checkRuleToWork(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+
+void MainTests::checkRuleToWork_noTitle(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    profList.append("fire mage");
+    profList.append("hunter");
+    profList.append("major captain");
+    sentence.tokens.append(Token( "we" , "we" , 1 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "found" , "find" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "out" , "out" , 3 , "RP" , "O" ));
+    sentence.tokens.append(Token( "that" , "that" , 4 , "IN" , "O" ));
+    sentence.tokens.append(Token( "Abigail" , "Abigail" , 5 , "NN" , "PERSON" ));
+    sentence.tokens.append(Token( "worked" , "work" , 6 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 7 , "IN" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 8 , "DT" , "O" ));
+    sentence.tokens.append(Token( "manager" , "manager" , 9 , "NN" , "O" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 2 ).setDep( "compound" , 3 );
+    sentence.getById( 6 ).setDep( "nsubj" , 5 );
+    sentence.getById( 9 ).setDep( "case" , 7 );
+    sentence.getById( 6 ).setDep( "obl" , 9 );
+    Rules::checkRuleToWork(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleToWork_titleIsNotNN(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    profList.append("fire mage");
+    profList.append("hunter");
+    profList.append("major captain");
+    sentence.tokens.append(Token( "we" , "we" , 1 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "found" , "find" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "out" , "out" , 3 , "RP" , "O" ));
+    sentence.tokens.append(Token( "that" , "that" , 4 , "IN" , "O" ));
+    sentence.tokens.append(Token( "Abigail" , "Abigail" , 5 , "NN" , "PERSON" ));
+    sentence.tokens.append(Token( "worked" , "work" , 6 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 7 , "IN" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 8 , "DT" , "O" ));
+    sentence.tokens.append(Token( "manager" , "manager" , 9 , "O" , "TITLE" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 2 ).setDep( "compound" , 3 );
+    sentence.getById( 6 ).setDep( "nsubj" , 5 );
+    sentence.getById( 9 ).setDep( "case" , 7 );
+    sentence.getById( 6 ).setDep( "obl" , 9 );
+    Rules::checkRuleToWork(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
     QString message;
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
