@@ -54,6 +54,7 @@ private slots:
     void checkRuleAppos1_twoProf();
     void checkRuleAppos1_notInList();
     void checkRuleAppos1_compProfNotInList();
+    void checkRuleAppos1_compProfsOneInList();
     void checkRuleAppos2_noProf();
     void checkRuleAppos2_oneProf();
     void checkRuleAppos2_compProf();
@@ -965,6 +966,35 @@ void MainTests::checkRuleAppos1_compProfNotInList(){
     sentence.getById( 3 ).setDep( "appos" , 7 );
     Rules::checkRuleAppos1(profNames,sentence,profList);
     QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleAppos1_compProfsOneInList(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    profList.append("forest archer");
+    sentence.tokens.append(Token( "It" , "it" , 1 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "was" , "be" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "Robin" , "Robin" , 3 , "NN" , "PERSON" ));
+    sentence.tokens.append(Token( "," , "," , 4 , "," , "O" ));
+    sentence.tokens.append(Token( "the" , "the" , 5 , "DT" , "O" ));
+    sentence.tokens.append(Token( "forest" , "forest" , 6 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "archer" , "archer" , 7 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "and" , "and" , 8 , "CC" , "O" ));
+    sentence.tokens.append(Token( "Stone" , "stone" , 9 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "knight" , "knight" , 10 , "NN" , "TITLE" ));
+    sentence.getById( 3 ).setDep( "nsubj" , 1 );
+    sentence.getById( 3 ).setDep( "punct" , 4 );
+    sentence.getById( 7 ).setDep( "compound" , 6 );
+    sentence.getById( 10 ).setDep( "compound" , 9 );
+    sentence.getById( 3 ).setDep( "appos" , 6 );
+    Rules::checkRuleAppos1(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    expected.insert("Robin","forest archer");
     QString message;
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
