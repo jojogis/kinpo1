@@ -185,7 +185,7 @@ void Rules::checkRuleJob(QMultiHash<QString, QString> &profNames, const Sentence
                 isNN(sentence.getById(token.nsubjDep)) &&
                 sentence.getById(token.nsubjDep).lemma == "job"){
             Token job = sentence.getById(token.nsubjDep);
-            if(isNN(job) && job.nmodDep != -1 &&
+            if(job.nmodDep != -1 &&
                     isNN(sentence.getById(job.nmodDep)) &&
                     sentence.getById(job.nmodDep).ner == Token::PERSON){
                 Token person = sentence.getById(job.nmodDep);
