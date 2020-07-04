@@ -71,6 +71,7 @@ private slots:
     void checkRuleToWork_twoPersons();
     void checkRuleReignOf_oneProf();
     void checkRuleReignOf_twoCharacter();
+    void checkRuleReignOf_profNotToPerson();
     void checRuleJob_oneProf();
     void checRuleJob_twoProf();
     void checRuleJob_compProf();
@@ -1448,6 +1449,28 @@ void MainTests::checkRuleReignOf_twoCharacter(){
     QMultiHash<QString,QString> expected;
     expected.insert("Richard","King");
     expected.insert("Catherine","King");
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleReignOf_profNotToPerson(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    sentence.tokens.append(Token( "down" , "down" , 1 , "RB" , "O" ));
+    sentence.tokens.append(Token( "to" , "to" , 2 , "IN" , "O" ));
+    sentence.tokens.append(Token( "the" , "the" , 3 , "DT" , "O" ));
+    sentence.tokens.append(Token( "reign" , "reign" , 4 , "NN" , "O" ));
+    sentence.tokens.append(Token( "of" , "of" , 5 , "IN" , "O" ));
+    sentence.tokens.append(Token( "his" , "he" , 6 , "PRP$" , "O" ));
+    sentence.tokens.append(Token( "son" , "son" , 7 , "NN" , "O" ));
+    sentence.getById( 4 ).setDep( "case" , 2 );
+    sentence.getById( 1 ).setDep( "obl" , 4 );
+    sentence.getById( 7 ).setDep( "case" , 5 );
+    sentence.getById( 7 ).setDep( "nmod" , 6 );
+    sentence.getById( 4 ).setDep( "nmod" , 7 );
+    Rules::checkRuleReignOf(profNames,sentence);
+    QMultiHash<QString,QString> expected;
     QString message;
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
