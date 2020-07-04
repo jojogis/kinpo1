@@ -60,6 +60,8 @@ private slots:
     void checkRuleAppos1_notInList();
     void checkRuleAppos1_compProfNotInList();
     void checkRuleAppos1_compProfsOneInList();
+    void checkRuleAppos1_notNN();
+    void checkRuleAppos1_noPunct();
     void checkRuleAppos2_noProf();
     void checkRuleAppos2_oneProf();
     void checkRuleAppos2_compProf();
@@ -1146,6 +1148,67 @@ void MainTests::checkRuleAppos1_compProfsOneInList(){
     Rules::checkRuleAppos1(profNames,sentence,profList);
     QMultiHash<QString,QString> expected;
     expected.insert("Robin","forest archer");
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleAppos1_notNN(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "His" , "he" , 1 , "PRP$" , "O" ));
+    sentence.tokens.append(Token( "father" , "father" , 2 , "NN" , "O" ));
+    sentence.tokens.append(Token( "handed" , "hand" , 3 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "them" , "they" , 4 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "to" , "to" , 5 , "IN" , "O" ));
+    sentence.tokens.append(Token( "Jory" , "Jory" , 6 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "Cassel" , "Cassel" , 7 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "," , "," , 8 , "," , "O" ));
+    sentence.tokens.append(Token( "the" , "the" , 9 , "DT" , "O" ));
+    sentence.tokens.append(Token( "captain" , "captain" , 10 , "O" , "TITLE" ));
+    sentence.tokens.append(Token( "." , "." , 11 , "." , "O" ));
+    sentence.getById( 2 ).setDep( "nmod" , 1 );
+    sentence.getById( 3 ).setDep( "nsubj" , 2 );
+    sentence.getById( 3 ).setDep( "obj" , 4 );
+    sentence.getById( 7 ).setDep( "case" , 5 );
+    sentence.getById( 7 ).setDep( "compound" , 6 );
+    sentence.getById( 7 ).setDep( "punct" , 8 );
+    sentence.getById( 7 ).setDep( "appos" , 10 );
+    sentence.getById( 3 ).setDep( "punct" , 11 );
+    Rules::checkRuleAppos1(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleAppos1_noPunct(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "His" , "he" , 1 , "PRP$" , "O" ));
+    sentence.tokens.append(Token( "father" , "father" , 2 , "NN" , "O" ));
+    sentence.tokens.append(Token( "handed" , "hand" , 3 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "them" , "they" , 4 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "to" , "to" , 5 , "IN" , "O" ));
+    sentence.tokens.append(Token( "Jory" , "Jory" , 6 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "Cassel" , "Cassel" , 7 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "," , "," , 8 , "," , "O" ));
+    sentence.tokens.append(Token( "the" , "the" , 9 , "DT" , "O" ));
+    sentence.tokens.append(Token( "captain" , "captain" , 10 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "." , "." , 11 , "." , "O" ));
+    sentence.getById( 2 ).setDep( "nmod" , 1 );
+    sentence.getById( 3 ).setDep( "nsubj" , 2 );
+    sentence.getById( 3 ).setDep( "obj" , 4 );
+    sentence.getById( 7 ).setDep( "case" , 5 );
+    sentence.getById( 7 ).setDep( "compound" , 6 );
+    sentence.getById( 7 ).setDep( "appos" , 10 );
+    sentence.getById( 3 ).setDep( "punct" , 11 );
+    Rules::checkRuleAppos1(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
     QString message;
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
