@@ -91,6 +91,7 @@ private slots:
     void checkRuleToPractice_twoProf();
     void checkRuleToPractice_compProf();
     void checkRuleToPractice_notInList();
+    void checkRuleToPractice_twoCompProfInList();
     void analyzeFileWithNames_1();
     void analyzeFileWithNames_2();
     void getCompoundProf_notComp();
@@ -1861,7 +1862,6 @@ void MainTests::checRuleJob_twoPersWithoutProf(){
 
 }
 
-//несколько односложный профессий у одно и одна составная у другого(из списка)
 void MainTests::checRuleJob_mix1(){
     QMultiHash<QString,QString> profNames;
     Sentence sentence;
@@ -1896,6 +1896,7 @@ void MainTests::checRuleJob_mix1(){
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
 }
+
 
 void MainTests::checkRuleToPractice_oneProf(){
     QMultiHash<QString,QString> profNames;
@@ -2003,6 +2004,36 @@ void MainTests::checkRuleToPractice_notInList(){
     sentence.getById( 2 ).setDep( "obl" , 5 );
     Rules::checkRuleToPractice(profNames,sentence,profList);
     QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleToPractice_twoCompProfInList(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    profList.append("fire mage");
+    profList.append("hunter");
+    profList.append("cyberpoliceman robot");
+    sentence.tokens.append(Token( "Mike" , "Mike" , 1 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "practiced" , "practice" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 3 , "IN" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 4 , "DT" , "O" ));
+    sentence.tokens.append(Token( "cyberpoliceman" , "cyberpoliceman" , 5 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "robot" , "robot" , 6 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "and" , "and" , 7 , "CC" , "O" ));
+    sentence.tokens.append(Token( "war" , "war" , 8 , "NN" , "CAUSE_OF_DEATH" ));
+    sentence.tokens.append(Token( "lord" , "lord" , 9 , "NN" , "O" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 6 ).setDep( "case" , 3 );
+    sentence.getById( 6 ).setDep( "compound" , 5 );
+    sentence.getById( 2 ).setDep( "obl" , 6 );
+    sentence.getById( 9 ).setDep( "compound" , 8 );
+    Rules::checkRuleToPractice(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    expected.insert("Mike","cyberpoliceman robot");
     QString message;
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
