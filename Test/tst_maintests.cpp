@@ -45,6 +45,7 @@ private slots:
     void checkRuleToBe_twoPersAndCompProfs();
     void checkRuleToBe_profAndCompProf();
     void checkRuleToBe_twoPersAndCompProfsInList();
+    void checkRuleToBe_twoPersAndCompProfsNotInList();
     void checkRuleAppos1_noProf();
     void checkRuleAppos1_oneProf();
     void checkRuleAppos1_compProf();
@@ -700,6 +701,33 @@ void MainTests::checkRuleToBe_twoPersAndCompProfsInList(){
     QMultiHash<QString,QString> expected;
     expected.insert("Mike","Major Captain");
     expected.insert("Clark","children doctor");
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+void MainTests::checkRuleToBe_twoPersAndCompProfsNotInList(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "Mike" , "Mike" , 1 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "is" , "be" , 2 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 3 , "DT" , "O" ));
+    sentence.tokens.append(Token( "Cyber" , "Cyber" , 4 , "NNP" , "O" ));
+    sentence.tokens.append(Token( "Robot" , "Robot" , 5 , "NNP" , "O" ));
+    sentence.tokens.append(Token( "and" , "and" , 6 , "CC" , "O" ));
+    sentence.tokens.append(Token( "Clark" , "Clark" , 7 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "is" , "be" , 8 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 9 , "DT" , "O" ));
+    sentence.tokens.append(Token( "War" , "War" , 10 , "NNP" , "CAUSE_OF_DEATH" ));
+    sentence.tokens.append(Token( "Loard" , "Loard" , 11 , "NNP" , "MISC" ));
+    sentence.getById( 5 ).setDep( "nsubj" , 1 );
+    sentence.getById( 5 ).setDep( "compound" , 4 );
+    sentence.getById( 11 ).setDep( "nsubj" , 7 );
+    sentence.getById( 11 ).setDep( "compound" , 10 );
+    Rules::checkRuleToBe(profNames,sentence,profList);
+
+    QMultiHash<QString,QString> expected;
     QString message;
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
