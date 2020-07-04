@@ -71,6 +71,8 @@ private slots:
     void checkRuleAppos2_profAndCompProf();
     void checkRuleAppos2_noApposDep();
     void checkRuleAppos2_notPERSON();
+    void checkRuleAppos2_notNN();
+    void checkRuleAppos2_noPunctDep();
     void checkRuleToWork_oneProf();
     void checkRuleToWork_compProf();
     void checkRuleToWork_fewProf();
@@ -1465,6 +1467,55 @@ void MainTests::checkRuleAppos2_notPERSON(){
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
 }
+
+void MainTests::checkRuleAppos2_notNN(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "His" , "he" , 1 , "PRP$" , "O" ));
+    sentence.tokens.append(Token( "honorable" , "honorable" , 2 , "JJ" , "O" ));
+    sentence.tokens.append(Token( "host" , "host" , 3 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "," , "," , 4 , "," , "O" ));
+    sentence.tokens.append(Token( "Illyrio" , "Illyrio" , 5 , "O" , "PERSON" ));
+    sentence.tokens.append(Token( "Mopatis" , "Mopatis" , 6 , "O" , "PERSON" ));
+    sentence.tokens.append(Token( "." , "." , 7 , "." , "O" ));
+    sentence.getById( 3 ).setDep( "nmod" , 1 );
+    sentence.getById( 3 ).setDep( "amod" , 2 );
+    sentence.getById( 3 ).setDep( "punct" , 4 );
+    sentence.getById( 6 ).setDep( "compound" , 5 );
+    sentence.getById( 3 ).setDep( "appos" , 6 );
+    sentence.getById( 3 ).setDep( "punct" , 7 );
+    Rules::checkRuleAppos2(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleAppos2_noPunctDep(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "His" , "he" , 1 , "PRP$" , "O" ));
+    sentence.tokens.append(Token( "honorable" , "honorable" , 2 , "JJ" , "O" ));
+    sentence.tokens.append(Token( "host" , "host" , 3 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "," , "," , 4 , "," , "O" ));
+    sentence.tokens.append(Token( "Illyrio" , "Illyrio" , 5 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "Mopatis" , "Mopatis" , 6 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "." , "." , 7 , "." , "O" ));
+    sentence.getById( 3 ).setDep( "nmod" , 1 );
+    sentence.getById( 3 ).setDep( "amod" , 2 );
+    sentence.getById( 6 ).setDep( "compound" , 5 );
+    sentence.getById( 3 ).setDep( "appos" , 6 );
+    Rules::checkRuleAppos2(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
 
 void MainTests::checkRuleToWork_oneProf(){
     QMultiHash<QString,QString> profNames;
