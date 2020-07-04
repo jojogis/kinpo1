@@ -28,6 +28,7 @@ private slots:
     void checkRuleCompound_prof_withoutTitleNotInList();
     void checkRuleCompound_clergyman();
     void checkRuleCompound_notInList();
+    void checkRuleCompound_notNN();
     void checkRuleAmod_no_prof();
     void checkRuleAmod_one_prof();
     void checkRuleAmod_likeProf();
@@ -287,6 +288,28 @@ void MainTests::checkRuleCompound_notInList(){
     sentence.getById( 3 ).setDep( "nsubj" , 1 );
     sentence.getById( 7 ).setDep( "case" , 4 );
     sentence.getById( 7 ).setDep( "compound" , 5 );
+    sentence.getById( 7 ).setDep( "compound" , 6 );
+    Rules::checkRuleCompound(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleCompound_notNN(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "Which" , "which" , 1 , "WDT" , "O" ));
+    sentence.tokens.append(Token( "had" , "have" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "been" , "be" , 3 , "VBN" , "O" ));
+    sentence.tokens.append(Token( "destroyed" , "destroy" , 4 , "VBN" , "O" ));
+    sentence.tokens.append(Token( "by" , "by" , 5 , "IN" , "O" ));
+    sentence.tokens.append(Token( "fool" , "fool" , 6 , "O" , "TITLE" ));
+    sentence.tokens.append(Token( "Openshaw" , "Openshaw" , 7 , "NNP" , "PERSON" ));
+    sentence.getById( 4 ).setDep( "nsubj" , 1 );
+    sentence.getById( 7 ).setDep( "case" , 5 );
     sentence.getById( 7 ).setDep( "compound" , 6 );
     Rules::checkRuleCompound(profNames,sentence,profList);
     QMultiHash<QString,QString> expected;
