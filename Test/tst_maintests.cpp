@@ -99,6 +99,7 @@ private slots:
     void getCompoundProf_notComp();
     void getCompoundProf_oneDepWord();
     void getCompoundProf_twoDepWord();
+    void getCompoundProf_profInList();
 
 };
 
@@ -2229,6 +2230,24 @@ void MainTests::getCompoundProf_twoDepWord(){
        QString prof;
        Rules::getCompoundProf(sentence,10,prof,profList);
        QCOMPARE(prof,"captain of his household guard");
+}
+
+
+void MainTests::getCompoundProf_profInList(){
+       Sentence sentence;
+       QStringList profList;
+       profList.append(perpList);
+       profList.append("cyberpoliceman of his guard");
+       sentence.tokens.append(Token( "cyberpoliceman" , "cyberpoliceman" , 1 , "NN" , "O" ));
+       sentence.tokens.append(Token( "of" , "of" , 2 , "IN" , "O" ));
+       sentence.tokens.append(Token( "his" , "he" , 3 , "PRP$" , "O" ));
+       sentence.tokens.append(Token( "guard" , "guard" , 4 , "NN" , "TITLE" ));
+       sentence.getById( 4 ).setDep( "case" , 2 );
+       sentence.getById( 4 ).setDep( "nmod" , 3 );
+       sentence.getById( 1 ).setDep( "nmod" , 4 );
+       QString prof;
+       Rules::getCompoundProf(sentence,1,prof,profList);
+       QCOMPARE(prof,"cyberpoliceman of his guard");
 }
 
 QTEST_MAIN(MainTests)
