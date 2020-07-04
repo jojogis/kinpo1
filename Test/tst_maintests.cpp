@@ -66,6 +66,7 @@ private slots:
     void checkRuleToWork_compProf();
     void checkRuleToWork_fewProf();
     void checkRuleToWork_NotInList();
+    void checkRuleToWork_twoCompProf();
     void checkRuleReignOf_oneProf();
     void checkRuleReignOf_twoCharacter();
     void checRuleJob_oneProf();
@@ -1308,6 +1309,37 @@ void MainTests::checkRuleToWork_NotInList(){
     sentence.getById( 2 ).setDep( "punct" , 6 );
     Rules::checkRuleToWork(profNames,sentence,profList);
     QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleToWork_twoCompProf(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    profList.append("war lord");
+    profList.append("hunter");
+    profList.append("cyberpolice robot");
+    sentence.tokens.append(Token( "Gabe" , "Gabe" , 1 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "works" , "work" , 2 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 3 , "IN" , "O" ));
+    sentence.tokens.append(Token( "a" , "a" , 4 , "DT" , "O" ));
+    sentence.tokens.append(Token( "cyberpolice" , "cyberpolice" , 5 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "robot" , "robot" , 6 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "and" , "and" , 7 , "CC" , "O" ));
+    sentence.tokens.append(Token( "war" , "war" , 8 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "lord" , "lord" , 9 , "NN" , "TITLE" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 6 ).setDep( "case" , 3 );
+    sentence.getById( 6 ).setDep( "compound" , 5 );
+    sentence.getById( 2 ).setDep( "obl" , 6 );
+    sentence.getById( 9 ).setDep( "compound" , 8 );
+    Rules::checkRuleToWork(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    expected.insert("Gabe","cyberpolice robot");
+    expected.insert("Gabe","war");
     QString message;
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
