@@ -35,6 +35,8 @@ private slots:
     void checkRuleAmod_compProf();
     void checkRuleAmod_notInList();
     void checkRuleAmod_compProfNotInList();
+    void checkRuleAmod_notJJ();
+    void checkRuleAmod_notUppercase();
     void checkRuleToBe_noProf();
     void checkRuleToBe_oneProf();
     void checkRuleToBe_twoProf();
@@ -473,6 +475,54 @@ void MainTests::checkRuleAmod_compProfNotInList(){
     Rules::checkRuleAmod(profNames,sentence,profList);
     QMultiHash<QString,QString> expected;
     expected.insert("Mike","major Captain");
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+}
+
+void MainTests::checkRuleAmod_notJJ(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+
+    sentence.tokens.append(Token( "I" , "I" , 1 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "like" , "like" , 2 , "VBP" , "O" ));
+    sentence.tokens.append(Token( "how" , "how" , 3 , "WRB" , "O" ));
+    sentence.tokens.append(Token( "Major" , "major" , 4 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "Captain" , "Captain" , 5 , "NNP" , "TITLE" ));
+    sentence.tokens.append(Token( "Mike" , "Mike" , 6 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "is" , "be" , 7 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "looking" , "look" , 8 , "VBG" , "O" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 6 ).setDep( "amod" , 4 );
+    sentence.getById( 6 ).setDep( "compound" , 5 );
+    sentence.getById( 8 ).setDep( "nsubj" , 6 );
+    Rules::checkRuleAmod(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+}
+
+void MainTests::checkRuleAmod_notUppercase(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+
+    sentence.tokens.append(Token( "I" , "I" , 1 , "PRP" , "O" ));
+    sentence.tokens.append(Token( "like" , "like" , 2 , "VBP" , "O" ));
+    sentence.tokens.append(Token( "how" , "how" , 3 , "WRB" , "O" ));
+    sentence.tokens.append(Token( "major" , "major" , 4 , "JJ" , "TITLE" ));
+    sentence.tokens.append(Token( "Captain" , "Captain" , 5 , "NNP" , "TITLE" ));
+    sentence.tokens.append(Token( "Mike" , "Mike" , 6 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "is" , "be" , 7 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "looking" , "look" , 8 , "VBG" , "O" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 6 ).setDep( "amod" , 4 );
+    sentence.getById( 6 ).setDep( "compound" , 5 );
+    sentence.getById( 8 ).setDep( "nsubj" , 6 );
+    Rules::checkRuleAmod(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
     QString message;
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 }
