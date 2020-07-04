@@ -72,6 +72,7 @@ private slots:
     void checkRuleReignOf_oneProf();
     void checkRuleReignOf_twoCharacter();
     void checkRuleReignOf_profNotToPerson();
+    void checkRuleReignOf_profNotToPersons();
     void checRuleJob_oneProf();
     void checRuleJob_twoProf();
     void checRuleJob_compProf();
@@ -1475,7 +1476,26 @@ void MainTests::checkRuleReignOf_profNotToPerson(){
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
 }
+void MainTests::checkRuleReignOf_profNotToPersons(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    sentence.tokens.append(Token( "reign" , "reign" , 1 , "NN" , "O" ));
+    sentence.tokens.append(Token( "of" , "of" , 2 , "IN" , "O" ));
+    sentence.tokens.append(Token( "beautiful" , "beautiful" , 3 , "JJ" , "O" ));
+    sentence.tokens.append(Token( "girl" , "girl" , 4 , "NN" , "O" ));
+    sentence.tokens.append(Token( "and" , "and" , 5 , "CC" , "O" ));
+    sentence.tokens.append(Token( "beautiful" , "beautiful" , 6 , "JJ" , "O" ));
+    sentence.tokens.append(Token( "man" , "man" , 7 , "NN" , "O" ));
+    sentence.getById( 4 ).setDep( "case" , 2 );
+    sentence.getById( 4 ).setDep( "amod" , 3 );
+    sentence.getById( 1 ).setDep( "nmod" , 4 );
+    sentence.getById( 7 ).setDep( "amod" , 6 );
+    Rules::checkRuleReignOf(profNames,sentence);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
+}
 void MainTests::checRuleJob_oneProf(){
     QMultiHash<QString,QString> profNames;
     Sentence sentence;
