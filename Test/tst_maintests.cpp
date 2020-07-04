@@ -78,6 +78,7 @@ private slots:
     void checRuleJob_twoProf();
     void checRuleJob_compProf();
     void checRuleJob_notInList();
+    void checRuleJob_twoCompProfNotInList();
     void checkRuleToPractice_oneProf();
     void checkRuleToPractice_twoProf();
     void checkRuleToPractice_compProf();
@@ -1604,6 +1605,32 @@ void MainTests::checRuleJob_notInList(){
     sentence.getById( 3 ).setDep( "nmod" , 1 );
     sentence.getById( 1 ).setDep( "case" , 2 );
     sentence.getById( 5 ).setDep( "nsubj" , 3 );
+    Rules::checkRuleJob(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checRuleJob_twoCompProfNotInList(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "Mike" , "Mike" , 1 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "'s" , "'s" , 2 , "POS" , "O" ));
+    sentence.tokens.append(Token( "job" , "job" , 3 , "NN" , "O" ));
+    sentence.tokens.append(Token( "is" , "be" , 4 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "cyberpoliceman" , "cyberpoliceman" , 5 , "JJ" , "O" ));
+    sentence.tokens.append(Token( "robot" , "robot" , 6 , "NN" , "O" ));
+    sentence.tokens.append(Token( "and" , "and" , 7 , "CC" , "O" ));
+    sentence.tokens.append(Token( "war" , "war" , 8 , "NN" , "CAUSE_OF_DEATH" ));
+    sentence.tokens.append(Token( "lord" , "lord" , 9 , "NN" , "O" ));
+    sentence.getById( 3 ).setDep( "nmod" , 1 );
+    sentence.getById( 1 ).setDep( "case" , 2 );
+    sentence.getById( 6 ).setDep( "nsubj" , 3 );
+    sentence.getById( 6 ).setDep( "amod" , 5 );
+    sentence.getById( 9 ).setDep( "compound" , 8 );;
     Rules::checkRuleJob(profNames,sentence,profList);
     QMultiHash<QString,QString> expected;
     QString message;
