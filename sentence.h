@@ -16,13 +16,13 @@ public:
     Sentence();
     QList<Token> tokens;///< список слов, входящих в предложение
 
-    const Token& Sentence::getById(int id) const;
+    const Token& getById(int id) const;
     /*!
         \brief Возвращает слово, по заданному id
         \param[in] id id нужного слова
         \return слово - экземпляр класса Token
     */
-    Token& Sentence::getById(int id);
+    Token& getById(int id);
     /*!
         \brief Возвращает строковое представление предложения
         \return предложение в обычном виде
