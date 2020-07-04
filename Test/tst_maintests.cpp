@@ -100,6 +100,8 @@ private slots:
     void getCompoundProf_oneDepWord();
     void getCompoundProf_twoDepWord();
     void getCompoundProf_profInList();
+    void getCompoundProf_profNotInList();
+    void getCompoundProf_twoProfInList();
 
 };
 
@@ -2248,6 +2250,40 @@ void MainTests::getCompoundProf_profInList(){
        QString prof;
        Rules::getCompoundProf(sentence,1,prof,profList);
        QCOMPARE(prof,"cyberpoliceman of his guard");
+}
+
+void MainTests::getCompoundProf_profNotInList(){
+       Sentence sentence;
+       QStringList profList;
+       profList.append(perpList);
+       sentence.tokens.append(Token( "cyberpoliceman" , "cyberpoliceman" , 1 , "NN" , "O" ));
+       sentence.tokens.append(Token( "of" , "of" , 2 , "IN" , "O" ));
+       sentence.tokens.append(Token( "his" , "he" , 3 , "PRP$" , "O" ));
+       sentence.tokens.append(Token( "guard" , "guard" , 4 , "NN" , "TITLE" ));
+       sentence.getById( 4 ).setDep( "case" , 2 );
+       sentence.getById( 4 ).setDep( "nmod" , 3 );
+       sentence.getById( 1 ).setDep( "nmod" , 4 );
+       QString prof;
+       Rules::getCompoundProf(sentence,1,prof,profList);
+       QCOMPARE(prof,"cyberpoliceman");
+}
+
+void MainTests::getCompoundProf_twoProfInList(){
+       Sentence sentence;
+       QStringList profList;
+       profList.append(perpList);
+       profList.append("cyberpoliceman of his guard");
+       profList.append("cyberpoliceman of his cyberguard");
+       sentence.tokens.append(Token( "cyberpoliceman" , "cyberpoliceman" , 1 , "NN" , "O" ));
+       sentence.tokens.append(Token( "of" , "of" , 2 , "IN" , "O" ));
+       sentence.tokens.append(Token( "his" , "he" , 3 , "PRP$" , "O" ));
+       sentence.tokens.append(Token( "cyberguard" , "cyberguard" , 4 , "NN" , "O" ));
+       sentence.getById( 4 ).setDep( "case" , 2 );
+       sentence.getById( 4 ).setDep( "nmod" , 3 );
+       sentence.getById( 1 ).setDep( "nmod" , 4 );
+       QString prof;
+       Rules::getCompoundProf(sentence,1,prof,profList);
+       QCOMPARE(prof,"cyberpoliceman of his cyberguard");
 }
 
 QTEST_MAIN(MainTests)
