@@ -84,6 +84,7 @@ private slots:
     void checRuleJob_profAndCompProfNotInList();
     void checRuleJob_twoPers();
     void checRuleJob_twoPersAndTwoProfs();
+    void checRuleJob_twoPersOneWithProf();
     void checkRuleToPractice_oneProf();
     void checkRuleToPractice_twoProf();
     void checkRuleToPractice_compProf();
@@ -1793,6 +1794,37 @@ void MainTests::checRuleJob_twoPersAndTwoProfs(){
     expected.insert("Carls","doctor");
     expected.insert("Mike","policeman");
     expected.insert("Mike","soldier");
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checRuleJob_twoPersOneWithProf(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    profList.append("cyberpoliceman robot");
+    sentence.tokens.append(Token( "Mike" , "Mike" , 1 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "'s" , "'s" , 2 , "POS" , "O" ));
+    sentence.tokens.append(Token( "job" , "job" , 3 , "NN" , "O" ));
+    sentence.tokens.append(Token( "is" , "be" , 4 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "policeman" , "policeman" , 5 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "and" , "and" , 6 , "CC" , "O" ));
+    sentence.tokens.append(Token( "Carls" , "Carls" , 7 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "'s" , "'s" , 8 , "POS" , "O" ));
+    sentence.tokens.append(Token( "job" , "job" , 9 , "NN" , "O" ));
+    sentence.tokens.append(Token( "is" , "be" , 10 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "fool" , "fool" , 11 , "NN" , "O" ));
+    sentence.getById( 3 ).setDep( "nmod" , 1 );
+    sentence.getById( 1 ).setDep( "case" , 2 );
+    sentence.getById( 5 ).setDep( "nsubj" , 3 );
+    sentence.getById( 9 ).setDep( "nmod" , 7 );
+    sentence.getById( 7 ).setDep( "case" , 8 );
+    sentence.getById( 11 ).setDep( "nsubj" , 9 );
+    Rules::checkRuleJob(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    expected.insert("Mike","policeman");
     QString message;
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
