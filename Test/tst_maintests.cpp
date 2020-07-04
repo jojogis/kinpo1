@@ -116,6 +116,11 @@ private slots:
     void checkRuleToPractice_twoCompProfInList();
     void checkRuleToPractice_twoCompProfOneInList();
     void checkRuleToPractice_twoCompProfNotInList();
+    void checkRuleToPractice_noNsubjDep();
+    void checkRuleToPractice_noObjDep();
+    void checkRuleToPractice_personNotNN();
+    void checkRuleToPractice_noPerson();
+    void checkRuleToPractice_titleNotNN();
     void analyzeFileWithNames_1();
     void analyzeFileWithNames_2();
     void getCompoundProf_notComp();
@@ -2678,6 +2683,134 @@ void MainTests::checkRuleToPractice_twoCompProfNotInList(){
     sentence.getById( 6 ).setDep( "compound" , 5 );
     sentence.getById( 2 ).setDep( "obl" , 6 );
     sentence.getById( 9 ).setDep( "compound" , 8 );
+    Rules::checkRuleToPractice(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+
+void MainTests::checkRuleToPractice_noNsubjDep(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "John" , "John" , 1 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "practiced" , "practice" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "for" , "for" , 3 , "IN" , "O" ));
+    sentence.tokens.append(Token( "some" , "some" , 4 , "DT" , "O" ));
+    sentence.tokens.append(Token( "time" , "time" , 5 , "NN" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 6 , "IN" , "O" ));
+    sentence.tokens.append(Token( "barrister" , "barrister" , 7 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "." , "." , 8 , "." , "O" ));
+    //sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 5 ).setDep( "case" , 3 );
+    sentence.getById( 2 ).setDep( "obl" , 5 );
+    sentence.getById( 7 ).setDep( "case" , 6 );
+    sentence.getById( 2 ).setDep( "obl" , 7 );
+    sentence.getById( 2 ).setDep( "punct" , 8 );
+    Rules::checkRuleToPractice(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+void MainTests::checkRuleToPractice_noObjDep(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "John" , "John" , 1 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "practiced" , "practice" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "for" , "for" , 3 , "IN" , "O" ));
+    sentence.tokens.append(Token( "some" , "some" , 4 , "DT" , "O" ));
+    sentence.tokens.append(Token( "time" , "time" , 5 , "NN" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 6 , "IN" , "O" ));
+    sentence.tokens.append(Token( "barrister" , "barrister" , 7 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "." , "." , 8 , "." , "O" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 5 ).setDep( "case" , 3 );
+    sentence.getById( 7 ).setDep( "case" , 6 );
+    //sentence.getById( 2 ).setDep( "obl" , 7 );
+    sentence.getById( 2 ).setDep( "punct" , 8 );
+    Rules::checkRuleToPractice(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleToPractice_personNotNN(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "John" , "John" , 1 , "O" , "PERSON" ));
+    sentence.tokens.append(Token( "practiced" , "practice" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "for" , "for" , 3 , "IN" , "O" ));
+    sentence.tokens.append(Token( "some" , "some" , 4 , "DT" , "O" ));
+    sentence.tokens.append(Token( "time" , "time" , 5 , "NN" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 6 , "IN" , "O" ));
+    sentence.tokens.append(Token( "barrister" , "barrister" , 7 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "." , "." , 8 , "." , "O" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 5 ).setDep( "case" , 3 );
+    sentence.getById( 2 ).setDep( "obl" , 5 );
+    sentence.getById( 7 ).setDep( "case" , 6 );
+    sentence.getById( 2 ).setDep( "obl" , 7 );
+    sentence.getById( 2 ).setDep( "punct" , 8 );
+    Rules::checkRuleToPractice(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+
+void MainTests::checkRuleToPractice_noPerson(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "John" , "John" , 1 , "NN" , "O" ));
+    sentence.tokens.append(Token( "practiced" , "practice" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "for" , "for" , 3 , "IN" , "O" ));
+    sentence.tokens.append(Token( "some" , "some" , 4 , "DT" , "O" ));
+    sentence.tokens.append(Token( "time" , "time" , 5 , "NN" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 6 , "IN" , "O" ));
+    sentence.tokens.append(Token( "barrister" , "barrister" , 7 , "NN" , "TITLE" ));
+    sentence.tokens.append(Token( "." , "." , 8 , "." , "O" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 5 ).setDep( "case" , 3 );
+    sentence.getById( 2 ).setDep( "obl" , 5 );
+    sentence.getById( 7 ).setDep( "case" , 6 );
+    sentence.getById( 2 ).setDep( "obl" , 7 );
+    sentence.getById( 2 ).setDep( "punct" , 8 );
+    Rules::checkRuleToPractice(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
+
+}
+void MainTests::checkRuleToPractice_titleNotNN(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    sentence.tokens.append(Token( "John" , "John" , 1 , "NN" , "PERSON" ));
+    sentence.tokens.append(Token( "practiced" , "practice" , 2 , "VBD" , "O" ));
+    sentence.tokens.append(Token( "for" , "for" , 3 , "IN" , "O" ));
+    sentence.tokens.append(Token( "some" , "some" , 4 , "DT" , "O" ));
+    sentence.tokens.append(Token( "time" , "time" , 5 , "NN" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 6 , "IN" , "O" ));
+    sentence.tokens.append(Token( "barrister" , "barrister" , 7 , "O" , "TITLE" ));
+    sentence.tokens.append(Token( "." , "." , 8 , "." , "O" ));
+    sentence.getById( 2 ).setDep( "nsubj" , 1 );
+    sentence.getById( 5 ).setDep( "case" , 3 );
+    sentence.getById( 2 ).setDep( "obl" , 5 );
+    sentence.getById( 7 ).setDep( "case" , 6 );
+    sentence.getById( 2 ).setDep( "obl" , 7 );
+    sentence.getById( 2 ).setDep( "punct" , 8 );
     Rules::checkRuleToPractice(profNames,sentence,profList);
     QMultiHash<QString,QString> expected;
     QString message;
