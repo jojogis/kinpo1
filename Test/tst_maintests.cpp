@@ -53,6 +53,7 @@ private slots:
     void checkRuleToBe_twoPersProfAndCompProfInList();
     void checkRuleToBe_withoutArticul();
     void checkRuleToBe_notTITLE();
+    void checkRuleToBe_wrongArticul();
     void checkRuleAppos1_noProf();
     void checkRuleAppos1_oneProf();
     void checkRuleAppos1_compProf();
@@ -966,7 +967,31 @@ void MainTests::checkRuleToBe_notTITLE(){
     QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
 }
+void MainTests::checkRuleToBe_wrongArticul(){
+    QMultiHash<QString,QString> profNames;
+    Sentence sentence;
+    QStringList profList;
+    profList.append(perpList);
+    profList.append("Cyber Robot");
+    sentence.tokens.append(Token( "Mike" , "Mike" , 1 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "is" , "be" , 2 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "as" , "as" , 3 , "DT" , "O" ));
+    sentence.tokens.append(Token( "Cyber" , "Cyber" , 4 , "NNP" , "TITLE" ));
+    sentence.tokens.append(Token( "Robot" , "Robot" , 5 , "NNP" , "TITLE" ));
+    sentence.tokens.append(Token( "and" , "and" , 6 , "CC" , "O" ));
+    sentence.tokens.append(Token( "Clark" , "Clark" , 7 , "NNP" , "PERSON" ));
+    sentence.tokens.append(Token( "is" , "be" , 8 , "VBZ" , "O" ));
+    sentence.tokens.append(Token( "doctor" , "doctor" , 9 , "NN" , "TITLE" ));
+    sentence.getById( 5 ).setDep( "nsubj" , 1 );
+    sentence.getById( 5 ).setDep( "compound" , 4 );
+    sentence.getById( 9 ).setDep( "nsubj" , 7 );
+    Rules::checkRuleToBe(profNames,sentence,profList);
+    QMultiHash<QString,QString> expected;
+    expected.insert("Clark","doctor");
+    QString message;
+    QVERIFY2(compareMultiHash(profNames,expected,message),message.toUtf8());
 
+}
 void MainTests::checkRuleAppos1_noProf(){
     QMultiHash<QString,QString> profNames;
     Sentence sentence;
