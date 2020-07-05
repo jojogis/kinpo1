@@ -1,6 +1,6 @@
 #include "token.h"
 
-Token::Token(QString word,QString lemma,int id,QString pos,QString ner)
+Token::Token(QString word, QString lemma, int id, QString pos, QString ner)
 {
     this->word = word;
     this->id = id;
@@ -52,6 +52,6 @@ void Token::setNER(QString str)
 */
 bool Token::isNeededDep(QString str)
 {
-    QStringList list = {"compound","amod","appos","punct","nmod","case","nsubj","obl"};
+    QStringList list = {"compound", "amod", "appos", "punct", "nmod", "case", "nsubj", "obl"};
     return list.indexOf(str) != -1;
 }
